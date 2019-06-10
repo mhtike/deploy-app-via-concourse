@@ -1,0 +1,87 @@
+groups:
+- name: main
+  jobs:
+  - unit-tests
+  - deploy-app
+  # - load-tests
+  - promote-new-version
+
+resources:
+- name: concourse-pipeline-samples
+  type: git
+  source:
+    branch: master
+    uri: https://github.com/mhtike/concourse-pipeline-samples.git
+- name: PWS
+  type: cf
+  source:
+    api: {{cf-api}}
+    organization: {{cf-organization}}
+    username: {{cf-username}}
+    password: {{cf-password}}
+    skip_cert_check: true
+    space: {{cf-space}}
+
+jobs:
+- name: unit-tests
+  serial: true
+  public: true
+  plan:
+  - get: concourse-pipeline-samples
+    trigger: true
+  - task: run-unit-tests
+    file: concourse-pipeline-samples/pipelines/appdev/blue-green-app-deployment/ci/tasks/unit-tests.yml
+
+- name: deploy-app
+  serial: true
+  public: true
+  plan:
+  - get: concourse-pipeline-samples
+    trigger: true
+    passed:
+      - unit-tests
+  - task: get-current-app-color
+    file: concourse-pipeline-samples/pipelines/appdev/blue-green-app-deployment/ci/tasks/current-app-get-info.yml
+    params:
+      CF_APP_SUFFIX: {{cf-app-suffix}}
+      CF_API: {{cf-api}}
+      CF_ORG: {{cf-organization}}
+      CF_USER: {{cf-username}}
+      CF_PWD: {{cf-password}}
+      CF_SPACE: {{cf-space}}
+  - task: prepare-app-manifest
+    file: concourse-pipeline-samples/pipelines/appdev/blue-green-app-deployment/ci/tasks/app-manifest-prep.yml
+    params:
+      CF_APP_SUFFIX: {{cf-app-suffix}}
+  - put: PWS
+    params:
+      manifest: app-manifest-output/manifest.yml
+      path: concourse-pipeline-samples/pipelines/appdev/blue-green-app-deployment/bgd-app
+
+- name: promote-new-version
+  serial: true
+  public: true
+  plan:
+  - get: concourse-pipeline-samples
+    trigger: true
+    # passed:
+    #   - load-tests
+  - task: get-current-app-color
+    file: concourse-pipeline-samples/pipelines/appdev/blue-green-app-deployment/ci/tasks/current-app-get-info.yml
+    params:
+      CF_APP_SUFFIX: {{cf-app-suffix}}
+      CF_API: {{cf-api}}
+      CF_ORG: {{cf-organization}}
+      CF_USER: {{cf-username}}
+      CF_PWD: {{cf-password}}
+      CF_SPACE: {{cf-space}}
+  - task: switch-app-routes
+    file: concourse-pipeline-samples/pipelines/appdev/blue-green-app-deployment/ci/tasks/update-routes.yml
+    params:
+      CF_APP_SUFFIX: {{cf-app-suffix}}
+      PWS_APP_DOMAIN: {{cf-app-domain}}
+      CF_API: {{cf-api}}
+      CF_ORG: {{cf-organization}}
+      CF_USER: {{cf-username}}
+      CF_PWD: {{cf-password}}
+      CF_SPACE: {{cf-space}}
