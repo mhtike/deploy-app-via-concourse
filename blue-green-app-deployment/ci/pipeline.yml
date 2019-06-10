@@ -79,7 +79,7 @@ jobs:
     file: concourse-pipeline-samples/pipelines/appdev/blue-green-app-deployment/ci/tasks/update-routes.yml
     params:
       CF_APP_SUFFIX: {{cf-app-suffix}}
-      PAS_APP_DOMAIN: {{cf-app-domain}}
+      CF_APP_DOMAIN: {{cf-app-domain}}
       CF_API: {{cf-api}}
       CF_ORG: {{cf-organization}}
       CF_USER: {{cf-username}}
