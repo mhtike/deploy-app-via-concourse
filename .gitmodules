@@ -4,6 +4,3 @@
 [submodule "simple-go-web-app"]
 	path = simple-go-web-app
 	url = https://github.com/mhtike/simple-go-web-app.git
-[submodule "concourse-pipeline-samples"]
-	path = concourse-pipeline-samples
-	url = https://github.com/mhtike/concourse-pipeline-samples.git
