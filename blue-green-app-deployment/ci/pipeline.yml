@@ -12,7 +12,7 @@ resources:
   source:
     branch: master
     uri: https://github.com/mhtike/concourse-pipeline-samples.git
-- name: PWS
+- name: PAS
   type: cf
   source:
     api: {{cf-api}}
@@ -53,7 +53,7 @@ jobs:
     file: concourse-pipeline-samples/pipelines/appdev/blue-green-app-deployment/ci/tasks/app-manifest-prep.yml
     params:
       CF_APP_SUFFIX: {{cf-app-suffix}}
-  - put: PWS
+  - put: PAS
     params:
       manifest: app-manifest-output/manifest.yml
       path: concourse-pipeline-samples/pipelines/appdev/blue-green-app-deployment/bgd-app
@@ -79,7 +79,7 @@ jobs:
     file: concourse-pipeline-samples/pipelines/appdev/blue-green-app-deployment/ci/tasks/update-routes.yml
     params:
       CF_APP_SUFFIX: {{cf-app-suffix}}
-      PWS_APP_DOMAIN: {{cf-app-domain}}
+      PAS_APP_DOMAIN: {{cf-app-domain}}
       CF_API: {{cf-api}}
       CF_ORG: {{cf-organization}}
       CF_USER: {{cf-username}}
