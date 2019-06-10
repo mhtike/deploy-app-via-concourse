@@ -1,0 +1,27 @@
+---
+resources:
+- name: my_go_repo
+  type: git
+  source:
+    uri: https://github.com/mhtike/simple-go-web-app.git
+    branch: master
+
+- name: pas
+  type: cf
+  source:
+    api: ((cf-api))
+    username: ((cf-username))
+    password: ((cf-password))
+    organization: ((cf-organization))
+    space: ((cf-space))
+    skip_cert_check: true
+
+jobs:
+- name: deploy-app
+  serial: true
+  plan:
+  - get: my_go_repo
+  - put: pas
+    params:
+      manifest: my_go_repo/manifest.yml
+      path: my_go_repo

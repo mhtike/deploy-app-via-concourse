@@ -1,0 +1,27 @@
+---
+resources:
+- name: my_spring_repo
+  type: git
+  source:
+    uri: https://github.com/mhtike/cf-sample-app-spring.git
+    branch: master
+
+- name: pas
+  type: cf
+  source:
+    api: ((cf-api))
+    username: ((cf-username))
+    password: ((cf-password))
+    organization: ((cf-organization))
+    space: ((cf-space))
+    skip_cert_check: true
+
+jobs:
+- name: deploy-app
+  serial: true
+  plan:
+  - get: my_spring_repo
+  - put: pas
+    params:
+      manifest: my_spring_repo/manifest.yml
+      path: my_spring_repo

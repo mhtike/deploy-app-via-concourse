@@ -1,0 +1,5 @@
+cf-api: https://api.sys.<my_domain>
+cf-username: email@mydomain
+cf-password: My_pswd
+cf-organization: My_Org_Name
+cf-space: My_Space_Name
